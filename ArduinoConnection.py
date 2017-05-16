@@ -2,7 +2,8 @@ from nanpy import (ArduinoApi, SerialManager)
 
 class ArduinoConnection():
     def __init__(self):
-        self.connect()
+        #self.connect()
+        pass
 
     def connect(self):
         try:

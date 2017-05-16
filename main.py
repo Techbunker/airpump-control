@@ -13,11 +13,15 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.graphics import Color, Rectangle
 from kivy.clock import Clock
 
+# -- Define Variables
+sensorpin = "A0"
+motorpin = 2
+
 class SteuerungApp(App):
     def update(self):
         pass
 
-    def press_callback(self, obj):
+    def press_callback(self, obj, motor):
         try:
             if obj.text == 'Shisha Modus An/Aus' and self.modeAuto == True:
 			if obj.state == "down":
@@ -41,10 +45,10 @@ class SteuerungApp(App):
 		if obj.text == 'Motor An/Aus' and self.modeAuto == False:
 			if obj.state == "down":
 				print ("button on")
-				a.digitalWrite(relais, a.HIGH)
+				motor.startMotor()
 			else:
 				print ("button off")
-				a.digitalWrite(relais, a.LOW)
+				motor.stopMotor()
 		elif obj.text == 'Motor An/Aus' and self.modeAuto == True:
 			obj.state="normal"
 	except:
@@ -58,6 +62,17 @@ class SteuerungApp(App):
 
     # Set up the layout:
 	def build(self):
+		global sensorpin
+		global motorpin
+
+		# Instatiate the various Objects needed in the Application.
+		arduinoconnection = ArduinoConnection()
+		sensor = SensorUpdate(sensorpin)
+		motor = MotorControl(motorpin)
+
+		# Connect to Arduino
+		arduino = arduinoconnection.connect()
+
         layout = GridLayout(cols=3, spacing=30, padding=30, row_default_height=150)
 
 
@@ -72,11 +87,11 @@ class SteuerungApp(App):
         labelHum=Label(text="[size=30]Luftfeuchtigkeit: "+"--"+"%[/size]", markup=True)
         labelQual=Label(text="[size=30]Luftqualitaet: "+"--"+"[/size]", markup=True)
         btnShisha=ToggleButton(text="Shisha Modus An/Aus")
-        btnShisha.bind(on_press=press_callback)
+        btnShisha.bind(on_press=press_callback(motor))
         btnMan=ToggleButton(text="Manueller Modus An/Aus")
-        btnMan.bind(on_press=press_callback)
+        btnMan.bind(on_press=press_callback(motor))
         btnStart=ToggleButton(text="Motor An/Aus")
-        btnStart.bind(on_press=press_callback)
+        btnStart.bind(on_press=press_callback(motor))
 
         # Add the Widgets to the Layout
         layout.add_widget(labelTemp)
