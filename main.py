@@ -17,6 +17,45 @@ class SteuerungApp(App):
     def update(self):
         pass
 
+    def press_callback(self, obj):
+        try:
+            if obj.text == 'Shisha Modus An/Aus' and self.modeAuto == True:
+			if obj.state == "down":
+				print ("button on")
+				self.modeShisha = True
+			else:
+				print ("button off")
+				self.modeShisha = False
+		elif obj.text == 'Shisha Modus An/Aus' and self.modeAuto == False:
+			obj.state = "normal"
+
+		if obj.text == 'Manueller Modus An/Aus':
+			if obj.state == "down" and self.threadRunning == False:
+				print ("button on")
+				self.modeAuto = False
+				self.modeShisha = False
+			else:
+				print ("button off")
+				self.modeAuto = True
+
+		if obj.text == 'Motor An/Aus' and self.modeAuto == False:
+			if obj.state == "down":
+				print ("button on")
+				a.digitalWrite(relais, a.HIGH)
+			else:
+				print ("button off")
+				a.digitalWrite(relais, a.LOW)
+		elif obj.text == 'Motor An/Aus' and self.modeAuto == True:
+			obj.state="normal"
+	except:
+		print "Error in press_callback()! Making new connection..."
+		try:
+			establish_connection()
+			print "New connection established"
+			press_callback(obj)
+		except:
+			print "Could not establish new connetion!"
+
     # Set up the layout:
 	def build(self):
         layout = GridLayout(cols=3, spacing=30, padding=30, row_default_height=150)
