@@ -14,7 +14,7 @@ from kivy.graphics import Color, Rectangle
 from kivy.clock import Clock
 
 class SteuerungApp(App):
-    def sensorupdate(self):
+    def update(self):
         pass
 
     # Set up the layout:
@@ -48,7 +48,7 @@ class SteuerungApp(App):
         layout.add_widget(btnStart)
 
         # Schedule update of Sensordata
-        Clock.schedule_interval(self.sensorupdate, 1.0/10.0)
+        Clock.schedule_interval(self.update, 1.0/10.0)
 
         return layout
 
