@@ -5,3 +5,4 @@ This Software makes use of:
   - Nanpy
   - Kivy
 
+This is a clean rewrite of the whole application.
