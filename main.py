@@ -3,6 +3,8 @@ import ArduinoConnection
 import SensorUpdate
 import MotorControl
 
+import time
+
 import kivy
 kivy.require('1.9.1')
 from kivy.app import App
@@ -14,14 +16,78 @@ from kivy.graphics import Color, Rectangle
 from kivy.clock import Clock
 
 # -- Define Variables
+buzzerpin = 3
 sensorpin = "A0"
 motorpin = 2
 
-class SteuerungApp(App):
-    def update(self):
-        pass
+sensorthresh = 28
+shishathresh = 35
 
-    def press_callback(self, obj, motor):
+runtime = 120
+shisharuntime = 180
+motorstarttimestamp = 0
+motorstoptimestamp = 0
+motorrunning = False
+
+arduinoconnection = None
+sensor = None
+motor = None
+arduino = None
+
+class SteuerungApp(App):
+    def update(self, modeAuto, modeShisha):
+    	global sensorthresh
+    	global shishathresh
+    	global runtime
+    	global shisharuntime
+    	global motorstarttimestamp
+    	global motorstoptimestamp
+    	global motorrunning
+
+    	global sensor
+    	global motor
+    	global arduino
+
+
+        sensorvalue = sensor.sensupdate()
+        actualtime = time.time()
+
+        try:
+	        if modeAuto:
+	        	if motorrunning and motorstoptimestamp <= actualtime:
+	        		print "Stop Motor!"
+	        		motor.stopMotor()
+
+	        	if modeShisha == False and sensorvalue > sensorthresh and motorrunning == False:
+	        		print "Activating!"
+	        		motorrunning = True
+	        		motorstarttimestamp = time.time()
+	        		motorstoptimestamp = motorstarttimestamp+runtime
+	        		motor.startMotor()
+	        		print "GOTO: Normal Loop"
+	        	elif modeShisha and sensorvalue > shishathresh and motorrunning == False:
+	        		print "Activating (ShishaMode)!"
+	        		motorrunning = True
+	        		motorstarttimestamp = time.time()
+	        		motorstoptimestamp = motorstarttimestamp+shisharuntime
+	        		motor.startMotor()
+	        		print "GOTO: Normal Loop"
+	        	elif motorrunning:
+	        		print "Motor is already running."
+	        	else:
+	        		print "Not activated."
+
+	        print "Smoke Sensor: "+str(sensorvalue)
+	    except:
+	    	print "Error in update()! Making new connection..."
+	    	arduino = arduinoconnection.connect()
+	    	print "New connection established."
+
+
+    def press_callback(self, obj):
+    	global motor
+    	global arduino
+
         try:
             if obj.text == 'Shisha Modus An/Aus' and self.modeAuto == True:
 			if obj.state == "down":
@@ -64,6 +130,11 @@ class SteuerungApp(App):
 	def build(self):
 		global sensorpin
 		global motorpin
+		
+		global arduinoconnection
+		global sensor
+		global motor
+		global arduino
 
 		# Instatiate the various Objects needed in the Application.
 		arduinoconnection = ArduinoConnection()
@@ -87,11 +158,11 @@ class SteuerungApp(App):
         labelHum=Label(text="[size=30]Luftfeuchtigkeit: "+"--"+"%[/size]", markup=True)
         labelQual=Label(text="[size=30]Luftqualitaet: "+"--"+"[/size]", markup=True)
         btnShisha=ToggleButton(text="Shisha Modus An/Aus")
-        btnShisha.bind(on_press=press_callback(motor))
+        btnShisha.bind(on_press=press_callback)
         btnMan=ToggleButton(text="Manueller Modus An/Aus")
-        btnMan.bind(on_press=press_callback(motor))
+        btnMan.bind(on_press=press_callback)
         btnStart=ToggleButton(text="Motor An/Aus")
-        btnStart.bind(on_press=press_callback(motor))
+        btnStart.bind(on_press=press_callback)
 
         # Add the Widgets to the Layout
         layout.add_widget(labelTemp)
@@ -102,7 +173,7 @@ class SteuerungApp(App):
         layout.add_widget(btnStart)
 
         # Schedule update of Sensordata
-        Clock.schedule_interval(self.update, 1.0/10.0)
+        Clock.schedule_interval(self.update(self.modeAuto, self.modeShisha), 1.0/10.0)
 
         return layout
 
