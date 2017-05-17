@@ -54,7 +54,7 @@ class SteuerungApp(App):
 	except:
 		print "Error in press_callback()! Making new connection..."
 		try:
-			establish_connection()
+			arduino = arduinoconnection.connect()
 			print "New connection established"
 			press_callback(obj)
 		except:
