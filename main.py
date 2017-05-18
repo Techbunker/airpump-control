@@ -22,6 +22,8 @@ motorpin = 2
 
 sensorthresh = 28
 shishathresh = 35
+modeAuto = True
+modeShisha = False
 
 runtime = 120
 shisharuntime = 180
@@ -35,7 +37,7 @@ motor = None
 arduino = None
 
 class SteuerungApp(App):
-    def update(self, modeAuto, modeShisha):
+    def update(self):
     	global sensorthresh
     	global shishathresh
     	global runtime
@@ -43,6 +45,8 @@ class SteuerungApp(App):
     	global motorstarttimestamp
     	global motorstoptimestamp
     	global motorrunning
+    	global modeAuto
+    	global modeShisha
 
     	global sensor
     	global motor
@@ -130,6 +134,8 @@ class SteuerungApp(App):
 	def build(self):
 		global sensorpin
 		global motorpin
+		global modeAuto
+		global modeShisha
 		
 		global arduinoconnection
 		global sensor
@@ -173,7 +179,7 @@ class SteuerungApp(App):
         layout.add_widget(btnStart)
 
         # Schedule update of Sensordata
-        Clock.schedule_interval(self.update(self.modeAuto, self.modeShisha), 1.0/10.0)
+        Clock.schedule_interval(self.update, 1.0/10.0)
 
         return layout
 
