@@ -5,4 +5,9 @@ This Software makes use of:
   - Nanpy
   - Kivy
 
+ Be sure that the dependencies are installed in order to run the program correctly.\n
+
+ The code runs on a Raspberry Pi with a Arduino hooked up.\n
+ To control the Arduino, Nanpy is installed on the Rpi and flashed onto the Arduino.
+
 This is a clean rewrite of the whole application.

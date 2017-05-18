@@ -1,3 +1,13 @@
+"""
+
+Title: Airpump-Control
+Author: Marco Schmidt
+
+This Application is used to Control the whole Controlpanel 
+of the Techbunker.
+
+"""
+
 # -- Imports --
 import ArduinoConnection
 import SensorUpdate
@@ -16,6 +26,10 @@ from kivy.graphics import Color, Rectangle
 from kivy.clock import Clock
 
 # -- Define Variables
+"""
+This Application really uses a lot of global variables.
+Nevertheless those global variables make the Application simpler.
+"""
 buzzerpin = 3
 sensorpin = "A0"
 motorpin = 2
@@ -51,6 +65,7 @@ class SteuerungApp(App):
     	global sensor
     	global motor
     	global arduino
+    	global arduinoconnection
 
 
         sensorvalue = sensor.sensupdate()
@@ -91,6 +106,7 @@ class SteuerungApp(App):
     def press_callback(self, obj):
     	global motor
     	global arduino
+    	global arduinoconnection
 
         try:
             if obj.text == 'Shisha Modus An/Aus' and self.modeAuto == True:
@@ -141,6 +157,7 @@ class SteuerungApp(App):
 		global sensor
 		global motor
 		global arduino
+		global arduinoconnection
 
 		# Instatiate the various Objects needed in the Application.
 		arduinoconnection = ArduinoConnection()
@@ -186,6 +203,6 @@ class SteuerungApp(App):
 
 
 
-
+# These two lines are needed in every Kivy Application to start it.
 if __name__ == '__main__':
     SteuerungApp().run()
