@@ -97,7 +97,7 @@ class SteuerungApp(App):
 	        		print "Not activated."
 
 	        print "Smoke Sensor: "+str(sensorvalue)
-	    except:
+		except:
 	    	print "Error in update()! Making new connection..."
 	    	arduino = arduinoconnection.connect()
 	    	print "New connection established."
