@@ -9,9 +9,9 @@ of the Techbunker.
 """
 
 # -- Imports --
-import ArduinoConnection
-import SensorUpdate
-import MotorControl
+from ArduinoConnection import ArduinoConnection
+from SensorUpdate import SensorUpdate
+from MotorControl import MotorControl
 
 import time
 
@@ -51,102 +51,103 @@ motor = None
 arduino = None
 
 class SteuerungApp(App):
-    def update(self):
-    	global sensorthresh
-    	global shishathresh
-    	global runtime
-    	global shisharuntime
-    	global motorstarttimestamp
-    	global motorstoptimestamp
-    	global motorrunning
-    	global modeAuto
-    	global modeShisha
+	def update(self, asdf):
+		global sensorthresh
+		global shishathresh
+		global runtime
+		global shisharuntime
+		global motorstarttimestamp
+		global motorstoptimestamp
+		global motorrunning
+		global modeAuto
+		global modeShisha
 
-    	global sensor
-    	global motor
-    	global arduino
-    	global arduinoconnection
-
-
-        sensorvalue = sensor.sensupdate()
-        actualtime = time.time()
-
-        try:
-	        if modeAuto:
-	        	if motorrunning and motorstoptimestamp <= actualtime:
-	        		print "Stop Motor!"
-	        		motor.stopMotor()
-
-	        	if modeShisha == False and sensorvalue > sensorthresh and motorrunning == False:
-	        		print "Activating!"
-	        		motorrunning = True
-	        		motorstarttimestamp = time.time()
-	        		motorstoptimestamp = motorstarttimestamp+runtime
-	        		motor.startMotor()
-	        		print "GOTO: Normal Loop"
-	        	elif modeShisha and sensorvalue > shishathresh and motorrunning == False:
-	        		print "Activating (ShishaMode)!"
-	        		motorrunning = True
-	        		motorstarttimestamp = time.time()
-	        		motorstoptimestamp = motorstarttimestamp+shisharuntime
-	        		motor.startMotor()
-	        		print "GOTO: Normal Loop"
-	        	elif motorrunning:
-	        		print "Motor is already running."
-	        	else:
-	        		print "Not activated."
-
-	        print "Smoke Sensor: "+str(sensorvalue)
-		except:
-	    	print "Error in update()! Making new connection..."
-	    	arduino = arduinoconnection.connect()
-	    	print "New connection established."
+		global sensor
+		global motor
+		global arduino
+		global arduinoconnectionvar
 
 
-    def press_callback(self, obj):
-    	global motor
-    	global arduino
-    	global arduinoconnection
+		sensorvalue = sensor.sensupdate(arduino, sensorpin)
+		actualtime = time.time()
 
-        try:
-            if obj.text == 'Shisha Modus An/Aus' and self.modeAuto == True:
-			if obj.state == "down":
-				print ("button on")
-				self.modeShisha = True
-			else:
-				print ("button off")
-				self.modeShisha = False
-		elif obj.text == 'Shisha Modus An/Aus' and self.modeAuto == False:
-			obj.state = "normal"
-
-		if obj.text == 'Manueller Modus An/Aus':
-			if obj.state == "down" and self.threadRunning == False:
-				print ("button on")
-				self.modeAuto = False
-				self.modeShisha = False
-			else:
-				print ("button off")
-				self.modeAuto = True
-
-		if obj.text == 'Motor An/Aus' and self.modeAuto == False:
-			if obj.state == "down":
-				print ("button on")
-				motor.startMotor()
-			else:
-				print ("button off")
-				motor.stopMotor()
-		elif obj.text == 'Motor An/Aus' and self.modeAuto == True:
-			obj.state="normal"
-	except:
-		print "Error in press_callback()! Making new connection..."
 		try:
-			arduino = arduinoconnection.connect()
-			print "New connection established"
-			press_callback(obj)
-		except:
-			print "Could not establish new connetion!"
+			if modeAuto:
+				if motorrunning and motorstoptimestamp <= actualtime:
+					print "Stop Motor!"
+					motor.stopMotor(motorpin)
 
-    # Set up the layout:
+				if modeShisha == False and sensorvalue > sensorthresh and motorrunning == False:
+					print "Activating!"
+					motorrunning = True
+					motorstarttimestamp = time.time()
+					motorstoptimestamp = motorstarttimestamp+runtime
+					motor.startMotor(motorpin)
+					print "GOTO: Normal Loop"
+				elif modeShisha and sensorvalue > shishathresh and motorrunning == False:
+					print "Activating (ShishaMode)!"
+					motorrunning = True
+					motorstarttimestamp = time.time()
+					motorstoptimestamp = motorstarttimestamp+shisharuntime
+					motor.startMotor(motorpin)
+					print "GOTO: Normal Loop"
+				elif motorrunning:
+					print "Motor is already running."
+				else:
+					print "Not activated."
+
+				print "Smoke Sensor: "+str(sensorvalue)
+		except:
+			print "Error in update()! Making new connection..."
+			arduino = arduinoconnectionvar.connect()
+			motorrunning = False
+			print "New connection established."
+
+
+	def press_callback(self, obj):
+		global motor
+		global arduino
+		global arduinoconnection
+
+		try:
+			if obj.text == 'Shisha Modus An/Aus' and self.modeAuto == True:
+				if obj.state == "down":
+					print ("button on")
+					self.modeShisha = True
+				else:
+					print ("button off")
+					self.modeShisha = False
+			elif obj.text == 'Shisha Modus An/Aus' and self.modeAuto == False:
+				obj.state = "normal"
+
+			if obj.text == 'Manueller Modus An/Aus':
+				if obj.state == "down" and self.threadRunning == False:
+					print ("button on")
+					self.modeAuto = False
+					self.modeShisha = False
+				else:
+					print ("button off")
+					self.modeAuto = True
+
+			if obj.text == 'Motor An/Aus' and self.modeAuto == False:
+				if obj.state == "down":
+					print ("button on")
+					motor.startMotor()
+				else:
+					print ("button off")
+					motor.stopMotor()
+			elif obj.text == 'Motor An/Aus' and self.modeAuto == True:
+				obj.state="normal"
+		except:
+			print "Error in press_callback()! Making new connection..."
+			try:
+				arduino = arduinoconnectionvar.connect()
+				print "New connection established"
+				press_callback(obj)
+			except:
+				print "Could not establish new connetion!"
+
+	# Set up the layout:
 	def build(self):
 		global sensorpin
 		global motorpin
@@ -157,52 +158,52 @@ class SteuerungApp(App):
 		global sensor
 		global motor
 		global arduino
-		global arduinoconnection
+		global arduinoconnectionvar
 
 		# Instatiate the various Objects needed in the Application.
-		arduinoconnection = ArduinoConnection()
+		arduinoconnectionvar = ArduinoConnection()
 		sensor = SensorUpdate(sensorpin)
 		motor = MotorControl(motorpin)
 
 		# Connect to Arduino
-		arduino = arduinoconnection.connect()
+		arduino = arduinoconnectionvar.connect()
 
-        layout = GridLayout(cols=3, spacing=30, padding=30, row_default_height=150)
-
-
-        # Make the background gray:
-        with layout.canvas.before:
-                Color(.2,.2,.2,1)
-                self.rect = Rectangle(size=(800,600), pos=layout.pos)
+		layout = GridLayout(cols=3, spacing=30, padding=30, row_default_height=150)
 
 
-        # Instantiate the various Widgets
-        labelTemp=Label(text="[size=30]Temperatur: "+"--"+"C[/size]", markup=True)
-        labelHum=Label(text="[size=30]Luftfeuchtigkeit: "+"--"+"%[/size]", markup=True)
-        labelQual=Label(text="[size=30]Luftqualitaet: "+"--"+"[/size]", markup=True)
-        btnShisha=ToggleButton(text="Shisha Modus An/Aus")
-        btnShisha.bind(on_press=press_callback)
-        btnMan=ToggleButton(text="Manueller Modus An/Aus")
-        btnMan.bind(on_press=press_callback)
-        btnStart=ToggleButton(text="Motor An/Aus")
-        btnStart.bind(on_press=press_callback)
+		# Make the background gray:
+		with layout.canvas.before:
+				Color(.2,.2,.2,1)
+				self.rect = Rectangle(size=(800,600), pos=layout.pos)
 
-        # Add the Widgets to the Layout
-        layout.add_widget(labelTemp)
-        layout.add_widget(labelHum)
-        layout.add_widget(labelQual)
-        layout.add_widget(btnShisha)
-        layout.add_widget(btnMan)
-        layout.add_widget(btnStart)
 
-        # Schedule update of Sensordata
-        Clock.schedule_interval(self.update, 1.0/10.0)
+		# Instantiate the various Widgets
+		labelTemp=Label(text="[size=30]Temperatur: "+"--"+"C[/size]", markup=True)
+		labelHum=Label(text="[size=30]Luftfeuchtigkeit: "+"--"+"%[/size]", markup=True)
+		labelQual=Label(text="[size=30]Luftqualitaet: "+"--"+"[/size]", markup=True)
+		btnShisha=ToggleButton(text="Shisha Modus An/Aus")
+		btnShisha.bind(on_press=self.press_callback)
+		btnMan=ToggleButton(text="Manueller Modus An/Aus")
+		btnMan.bind(on_press=self.press_callback)
+		btnStart=ToggleButton(text="Motor An/Aus")
+		btnStart.bind(on_press=self.press_callback)
 
-        return layout
+		# Add the Widgets to the Layout
+		layout.add_widget(labelTemp)
+		layout.add_widget(labelHum)
+		layout.add_widget(labelQual)
+		layout.add_widget(btnShisha)
+		layout.add_widget(btnMan)
+		layout.add_widget(btnStart)
+
+		# Schedule update of Sensordata
+		Clock.schedule_interval(self.update, 1.0/10.0)
+
+		return layout
 
 
 
 
 # These two lines are needed in every Kivy Application to start it.
 if __name__ == '__main__':
-    SteuerungApp().run()
+	SteuerungApp().run()

@@ -7,9 +7,11 @@ class ArduinoConnection():
 
     def connect(self):
         try:
-            self.connection = SerialManager()
-            self.a = ArduinoApi(self.connection = self.connection)
+            connection = SerialManager()
+            a = ArduinoApi(connection = connection)
             print "Connection established!"
+            print a
+            return a
         except:
-	        print "Connection Error!"
-        return self.a
+            print "Connection Error!"
+            self.connect()
