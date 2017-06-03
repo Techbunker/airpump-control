@@ -23,8 +23,8 @@ threadRunning = False
 buzzer = 3
 smoke = "A0"
 relais = 2
-sensorthresh = 28
-shishathresh = 35
+sensorthresh = 15
+shishathresh = 25
 sensorvalue = 0
 
 modeAuto = True
