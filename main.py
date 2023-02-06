@@ -13,7 +13,7 @@ from kivy.clock import Clock
 
 from nanpy import (ArduinoApi, SerialManager)
 from time import sleep
-
+#
 # -- Define Variables --
 global a
 global sensorvalue
